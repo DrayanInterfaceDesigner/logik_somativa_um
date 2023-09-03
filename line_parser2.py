@@ -238,7 +238,13 @@ def _skolemize(nesting, input, output=""):
     nesting-=1
     _skolemize(nesting, input, output)
 
-
+def demorgan(line):
+    line = de_negate_every_member(line)
+    _line = ""
+    for char in line:
+        _char = _switch_operator(char)
+        _line += _char
+    return _line
 
 
 
