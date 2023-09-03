@@ -193,6 +193,42 @@ def _skolemize(nesting, input, output=""):
 
 
 
+
+# ++++++++++++++++++++++++++++++++++++++++
+
+def splits(line):
+    arroba = []
+
+    for x in range(len(line)): 
+        if line[x] == "@":
+            arroba.append(x)
+
+    cut = arroba[-1]
+    _quantifiers = line[:cut + 1]
+    expression = line[cut + 1:]
+
+    # print(_quantifiers, "\n", expression)
+    return _quantifiers, expression
+
+
+def subdivide(line):
+
+    original_string_copy = ''
+    _quantifiers, expression = splits(line)
+
+    for i in range(len(expression)):
+        original_string_copy += expression[i] 
+        if expression[i] == "→":
+            print("osihdskhsd")
+
+        
+
+    # print(line, "\n", original_string_copy, "\n", _quantifiers, "\n", expression)
+    return line
+
+# ++++++++++++++++++++++++++++++++++++++++
+
+
 # ESSE CARA EH O PIKA
 def _process_(line):
 
@@ -201,7 +237,6 @@ def _process_(line):
     line = subdivide(line)
     
     return line
-
 
 
 # skolemization([])
@@ -220,6 +255,7 @@ print(_process_(line))
 # Now, what if it was ¬(¬𝑋 ∧ ¬𝑌(k)) ? 
 # print(de_negate_every_member("¬(*¬P* ∨ *¬Q(k)*)"))
 
+<<<<<<< HEAD
 
 # de_negate_every_member(" ¬    (aaa¬(")
 
@@ -237,3 +273,12 @@ output_string = re.sub(r'(¬{2,})', '$', input_string)
 
 # Print the result
 # print(output_string)
+=======
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+# print(_process_(line))
+# @∀(xyz)@ @∃x@ (*P(x)* ∧ *Q( x,y, z)* ↔ (*R* → (*P* → ¬*Q*)))
+line = "@∀(xyz)@ @∃x@ (*P(x)* ∧ *Q( x,y, z)* ↔ (*R* → (*P* → ¬*Q*)))"
+subdivide(line)
+>>>>>>> 8a82c6cd33fa6886f60f1b8b41cdb41eb62bf87b
