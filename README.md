@@ -1,0 +1,2 @@
+# logik_somativa_um
+ MEU DEUS AAAAAAAAAAAAAAAAAAAAAAAA
