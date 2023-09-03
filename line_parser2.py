@@ -71,12 +71,12 @@ def de_negate_every_member(fragment):
         fragment = re.sub(r'(?<!¬)¬(?!¬)', '', fragment)
 
         # replace every two or more ¬ with only one ¬
-        fragment = re.sub(r'(¬{2,})', '¬', input_string)
+        fragment = re.sub(r'(¬{2,})', '¬', fragment)
 
         return fragment
 
     else:
-        fragment = re.sub(r'(¬{2,})', '', input_string)
+        fragment = re.sub(r'(¬{2,})', '', fragment)
         return fragment
     # find every ¬¬ and replace with nothing.
     # find every ¬(¬ ... ¬ ... ¬) and
@@ -252,31 +252,3 @@ def _process_(line):
 
 # Now, what if it was ¬(¬𝑋 ∧ ¬𝑌(k)) ? 
 # print(de_negate_every_member("¬(*¬P* ∨ *¬Q(k)*)"))
-
-<<<<<<< HEAD
-
-# de_negate_every_member(" ¬    (aaa¬(")
-
-# Define the input string
-input_string = "i am a text ¬wow ¬¬yey ¬¬¬"
-
-# Define the regex pattern to match groups of "A" (2 or more)
-pattern = r'(A{2,})'
-
-# Define the replacement string
-replacement = '$'
-
-# Use re.sub() to replace the matches
-output_string = re.sub(r'(¬{2,})', '$', input_string)
-
-# Print the result
-# print(output_string)
-=======
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-# print(_process_(line))
-# @∀(xyz)@ @∃x@ (*P(x)* ∧ *Q( x,y, z)* ↔ (*R* → (*P* → ¬*Q*)))
-line = "@∀(xyz)@ @∃x@ (*P(x)* ∧ *Q( x,y, z)* ↔ (*R* → (*P* → ¬*Q*)))"
-subdivide(line)
->>>>>>> 8a82c6cd33fa6886f60f1b8b41cdb41eb62bf87b
