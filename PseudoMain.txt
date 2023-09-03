@@ -1,0 +1,42 @@
+open textFile(path)
+
+for line in textFile:
+
+	display(Latex(eq)) # print inicial pra mostrar a equação inicial antes das modificações
+
+	parse(eq)
+	
+	NNF(eq):
+		var = 1
+		while var != 0:
+			if (X <-> Y) then (X v ~Y) ^ (~X v Y)
+			if (X -> Y) then (~X v Y)
+			if ~(X v Y) then (~X ^ ~Y)
+			if ~(X ^ Y) then (~X v ~Y)
+			if ~~X then X
+			else var = 0
+
+		skolem(eq)
+
+		return nnf_eq
+	
+	CNF(nnf_eq):
+		var = 1
+		while var != 0:
+			if X v (Y ^ Z) then (X v Y) ^ (X v Z)
+			if (X ^ Y) v Z then (X v Z) ^ (Y v Z)
+			else var = 0
+
+		return cnf_eq
+
+	DNF(nnf_eq):
+		var = 1
+		while var != 0:
+			if X ^ (Y v Z) then (X ^ Y) v (X ^ Z)
+			if (X v Y) ^ Z then (X ^ Z) v (Y ^ Z)
+			else var = 0
+
+		return dnf_eq
+
+	display(Latex(cnf_eq))
+	display(Latex(dnf_eq))
