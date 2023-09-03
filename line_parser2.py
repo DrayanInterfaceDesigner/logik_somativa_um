@@ -1,4 +1,5 @@
 import re
+
 predicates_chars_one = ['𝐴', '𝐵', '𝐶', '𝐷', '𝐸', '𝐹', '𝐺', '𝐻', '𝐼', '𝐽', '𝐾', '𝐿', '𝑀', '𝑁', '𝑂', '𝑃', '𝑄', '𝑅', '𝑆', '𝑇', '𝑈', '𝑉', '𝑊', '𝑋', '𝑌', '𝑍']
 predicates_chars_two = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 latex = [fr"\wedge", fr"\vee", fr"\neg ", fr"\rightarrow", fr"\leftrightarrow", fr"\forall ", fr"\exists ", fr"\equiv "]
@@ -245,12 +246,9 @@ def _process_(line):
 # string_after_regex = re.sub(r'([A-Z])\(([^)]*)\)', r'*\1(\2)*', string)
 # print(string_after_regex)
 
-print(_process_(line))
-
 # Example for ¬(𝑋 ∨ 𝑌(k) ) =>  (¬𝑋 ∧ ¬𝑌(k) )
 # supposing the input was ¬(P ∨ Q(k))
 # print(_switch_operator(negate_every_member("(*P* ∨ *Q(k)*)")))
-
 
 # Now, what if it was ¬(¬𝑋 ∧ ¬𝑌(k)) ? 
 # print(de_negate_every_member("¬(*¬P* ∨ *¬Q(k)*)"))
