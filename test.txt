@@ -1,4 +1,4 @@
-(𝑎2 ∧ ¬𝑏2 ∨ 𝑎2 <-> 𝑏2 ∧ 𝑎1 ∧ ¬𝑏1 ∨ ( 𝑎2 <-> 𝑏2 ∧ 𝑎1 <-> 𝑏1 ∧ (𝑎0 ∧ ¬𝑏0)))
-bbb
-vccc
-amjo
+\forall (xyz) \exists x (P(x) \wedge Q( x,y, z) \leftrightarrow (R \rightarrow (P \rightarrow \neg Q)))
+\forall (xyz) \exists x (P(x) \wedge Q( x,y, z) \leftrightarrow (R \rightarrow (P \rightarrow \neg Q)))
+\forall (xyz) \exists x (P(x) \wedge Q( x,y, z) \leftrightarrow (R \rightarrow (P \rightarrow \neg Q)))
+\forall (xyz) \exists x (P(x) \wedge Q( x,y, z) \leftrightarrow (R \rightarrow (P \rightarrow \neg Q)))

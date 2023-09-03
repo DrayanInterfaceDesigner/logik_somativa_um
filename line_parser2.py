@@ -46,6 +46,59 @@ def de_negate_every_member(fragment):
 
     trimmed = fragment
     trimmed = trimmed.replace(" ", "")
+    fragment = fragment
+
+    if(trimmed.startswith("¬(")):
+
+        # Removing any double negation
+        fragment = re.sub(r'(¬{2,})', '', fragment)
+        print(fragment)
+
+        # marking down every negated
+        fragment = re.sub(r'¬\*(.*?)\*', r'¬&\1&', fragment)
+        print(fragment)
+
+        # negating every positive (non-marked)
+        fragment = re.sub(r'\*(.*?)\*', r'*¬\1*', fragment)
+        print(fragment)
+
+        # de_negating every negated (marked down)
+        fragment = re.sub(r'¬&([^&]*)&', r'*\1*', fragment)
+        print(fragment)
+
+
+        # > ¬(P ^ ¬Q ^ ¬¬P) negate every double negated, 
+        fragment = re.sub(r'¬¬\*(.*?)\*', r'¬*\1*', fragment)
+        # because
+        # every double negated, if there's any, is actually a triple
+        # negated, so in this case ¬¬P = P, ¬( is negating it again,
+        # therefore, P = ¬P
+
+        # ugly: removing by brute-force the first negation
+        fragment = re.sub(r'¬\(', r'(', fragment)
+
+        print(fragment)
+        return fragment
+
+    else:
+        fragment = re.sub(r'(¬{2,})', '', fragment)
+        return fragment
+    # find every ¬¬ and replace with nothing.
+    # find every ¬(¬ ... ¬ ... ¬) and
+    # replace with nothing (the hard one :p)
+    # basically, if fragment startsWith('¬')
+    # remove every '¬' (not that hard), but not
+    # pairs of '¬'
+
+    # WARNING!!!!!!!!!!!:
+    # actually:
+    # if starts with '¬('
+    # every '¬' replace with nothing 
+    # every '¬¬' replace for '¬'
+    return fragment
+
+    trimmed = fragment
+    trimmed = trimmed.replace(" ", "")
     if(trimmed.startswith("¬(")):
 
         # This here will distribute the ¬ over the predicates.
@@ -190,11 +243,6 @@ def _skolemize(nesting, input, output=""):
 
 
 
-
-
-
-
-
 # ++++++++++++++++++++++++++++++++++++++++
 
 def splits(line):
@@ -235,7 +283,7 @@ def _process_(line):
 
     line = replyce_all_symmetrical(line, latex, math)
     line = highlight(line)
-    line = subdivide(line)
+    # line = subdivide(line)
     
     return line
 
@@ -252,3 +300,4 @@ def _process_(line):
 
 # Now, what if it was ¬(¬𝑋 ∧ ¬𝑌(k)) ? 
 # print(de_negate_every_member("¬(*¬P* ∨ *¬Q(k)*)"))
+# print(_switch_operator(de_negate_every_member("¬((*X* ∨ ¬*Y*) ∧ (¬*X* ∨ *Y*))")))
