@@ -282,6 +282,7 @@ def subdivide(line):
 def _process_(line):
 
     line = replyce_all_symmetrical(line, latex, math)
+    print("Modified: ", line)
     line = highlight(line)
     # line = subdivide(line)
     

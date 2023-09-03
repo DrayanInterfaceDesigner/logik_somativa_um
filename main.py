@@ -7,7 +7,8 @@ def main():
         lines = file.readlines()
     
     for line in lines:
-        print(_process_(line))
+        print("Original: ", line)
+        print("Result: ", _process_(line))
 
 if __name__ == "__main__":
     main()
