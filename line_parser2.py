@@ -36,13 +36,47 @@ def _switch_operator(fragment):
 
 def negate_every_member(fragment):
     # TODO:
-    # Also find every composed predicate - DONE
+    # Also find every composed predicate - DONE 
     fragment = re.sub(r'([A-Z])\(([^)]*)\)', r'¬\1(\2)', fragment)
     fragment = re.sub(r'(?<![A-Z])\b([A-Z])\b(?! *\()', r'¬\1', fragment)
     return fragment
 
 def de_negate_every_member(fragment):
-    # TODO:
+
+    trimmed = fragment
+    trimmed = trimmed.replace(" ", "")
+    if(trimmed.startswith("¬(")):
+
+        # This here will distribute the ¬ over the predicates.
+        # For: ¬(¬P ^ Q ^ ¬¬P)
+        # It will do:
+
+        # finding by predicate
+        # > ¬(¬P ^ $*Q*$ ^ ¬¬P) markdown the non-negated
+
+        # finding by ¬ 
+        # > ¬(P ^ $*Q*$  ^ ¬¬P) de_negate every negated
+        
+        # finding by predicate
+        # > ¬(P ^ ¬Q ^ ¬¬P) negate the non-negated(marked down)
+
+        # > ¬(P ^ ¬Q ^ ¬¬P) negate every double negated, 
+        # because
+        # every double negated, if there's any, is actually a triple
+        # negated, so in this case ¬¬P = P, ¬( is negating it again,
+        # therefore, P = ¬P
+        print('yes')
+        # replace every lonely ¬ with nothing
+        fragment = re.sub(r'(?<!¬)¬(?!¬)', '', fragment)
+
+        # replace every two or more ¬ with only one ¬
+        fragment = re.sub(r'(¬{2,})', '¬', input_string)
+
+        return fragment
+
+    else:
+        fragment = re.sub(r'(¬{2,})', '', input_string)
+        return fragment
     # find every ¬¬ and replace with nothing.
     # find every ¬(¬ ... ¬ ... ¬) and
     # replace with nothing (the hard one :p)
@@ -139,7 +173,6 @@ def skolemization(quantifiers):
 
     return output
 
-
 def _skolemize(nesting, input, output=""):
     if(nesting == 0):
         print(f"f({output})")
@@ -186,3 +219,21 @@ print(_process_(line))
 
 # Now, what if it was ¬(¬𝑋 ∧ ¬𝑌(k)) ? 
 # print(de_negate_every_member("¬(*¬P* ∨ *¬Q(k)*)"))
+
+
+# de_negate_every_member(" ¬    (aaa¬(")
+
+# Define the input string
+input_string = "i am a text ¬wow ¬¬yey ¬¬¬"
+
+# Define the regex pattern to match groups of "A" (2 or more)
+pattern = r'(A{2,})'
+
+# Define the replacement string
+replacement = '$'
+
+# Use re.sub() to replace the matches
+output_string = re.sub(r'(¬{2,})', '$', input_string)
+
+# Print the result
+# print(output_string)
