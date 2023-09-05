@@ -402,8 +402,13 @@ def is_char_in_line(line, char):
     return bool(re.search(char, line))
 
 def find_for_distribution(line, conj=True):
-    divisor = '∨' if conj else '∧'
-    look_inside = '∧' if conj else '∨'
+    
+    if conj == True:
+        divisor = '∨'
+        look_inside = '∧'
+    else:
+        divisor = '∧'
+        look_inside = '∨'
     
     for char in range(len(line)):
         c = line[char]
@@ -415,33 +420,59 @@ def find_for_distribution(line, conj=True):
             if(bool_a or bool_b): return [A, B]
     return None
 
-def distributiva(line, conj=True):
-    
-    divisor = '∨' if conj else '∧'
-    look_inside = '∧' if conj else '∨'
+def distributiva(line, conj):
+    _line = ''
+
+    if conj == True:
+        divisor = '∨'
+        look_inside = '∧'
+    else:
+        divisor = '∧'
+        look_inside = '∨'
     
     sides = find_for_distribution(line, conj)
     if sides is None: raise Exception("[Distribution error => disjuntive]: No sides to distribute blz?.")
+
+    sideA = sides[0][0]
+    sideB = sides[1][0]
             
-    if is_char_in_line(sides[0], look_inside):
+    if is_char_in_line(sideA, look_inside):
 
-        index : int = find_char_in_line(sides[0], look_inside)
+        index : int = find_char_in_line(sideA, look_inside)
 
-        a = find_directionally(sides[0], index, -1)
-        b = find_directionally(sides[0], index, 1)
+        a = find_directionally(sideA, index, -1)
+        b = find_directionally(sideA, index, 1)
 
-        line = f"{sides[1]} {look_inside} {a} {divisor} {sides[1]} {look_inside} {b}"
+        # print(a, "marcelo", b)
 
-    elif is_char_in_line(sides[1], look_inside):
+        result = f"({sideB} {divisor} {a[0]}) {look_inside} ({sideB} {divisor} {b[0]})"
+        la = line[0 : sides[0][1] -2]
+        lb = line[sides[1][1] +1 : ]
 
-        index : int = find_char_in_line(sides[1], look_inside)
+        print(la, 'renato', result, 'aurelio', lb)
 
-        a = find_directionally(sides[1], index, -1)
-        b = find_directionally(sides[1], index, 1)
+        _line = _concat_in_between(la, result, lb)
 
-        line = f"{sides[0]} {look_inside} {a} {divisor} {sides[0]} {look_inside} {b}"
+    elif is_char_in_line(sideB, look_inside):
 
-    return line
+        index : int = find_char_in_line(sideB, look_inside)
+
+        a = find_directionally(sideB, index, -1)
+        b = find_directionally(sideB, index, 1)
+
+        result = f"({sideA} {divisor} {a[0]}) {look_inside} ({sideA} {divisor} {b[0]})"
+        la = line[0 : sides[0][1] -2]
+        lb = line[sides[1][1] +1 : ]
+
+        print(la, 'renato', result, 'aurelio', lb)
+
+        _line = _concat_in_between(la, result, lb)
+        
+    # print('leonardo', _line)
+    return result
+
+# x = (( (*R(w)* ∨  (*P* ∨ *Q*) )  ∨ *Q(x, y, z)*) ∧ *¬Q(x, y, z)*) ∨ (( (*R(w)* ∨  (*P* ∨ *Q*) )  ∨ *Q(x, y, z)*) ∧ (*¬R(w)* ∨  (*¬P* ∨ *Q*) ))
+    
 
 
 
@@ -553,17 +584,34 @@ def _process_(line):
         A = find_directionally(line, index, -1)
         B = find_directionally(line, index, 1)
 
-        la = line[0 : A[1] -1]
+        la = line[0 : A[1] -2]
         lb = line[B[1] +1 : ]
 
         x = resolve_implication(A[0], B[0])
 
         line = _concat_in_between(la, x, lb)
 
-        print(B)
-        print(line)
+        # print(la)
+        # print(x)
+        # print(lb)
+        # print(line +  '\n')
 
     print('\nNegative Nominal Form: ' + line)
+
+    # ++++++++++++ Conjunctive ++++++++++++++++++++++++++++++++
+    s = 1
+    x = line
+    while s != 0:
+        x = distributiva(x, False)
+        print('\nMARCOS', line)
+        print('DAR O CU', x)
+        if x == line:
+            s = 0
+
+    print(line)
+    
+
+    # ++++++++++++ Disjunctive ++++++++++++++++++++++++++++++++
 
     return (quantifiers + enclosure(line))
 
