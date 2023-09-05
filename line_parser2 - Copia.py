@@ -145,7 +145,7 @@ def find_directionally(line, index, direction=1):
     
         
     if direction < 0: resultant_string = resultant_string[::-1]
-    # print("----end-----")
+    # # print("----end-----")
     return [resultant_string, char_counter]
 
 def pop_parentheses(fragment):
@@ -448,18 +448,45 @@ def distributiva(line, conj=True):
 # ++++++++++++++++++++++++++++++++++++++++
 
 def splits(line):
-    arroba = []
+    """
+    This function splits an given equation into
+    two groups. One with quantifiers, and the other 
+    with the equation with its quantifiers extracted
+    from it.
 
-    for x in range(len(line)): 
-        if line[x] == "@":
-            arroba.append(x)
+    Returns an array with two strings: quantifiers and equation.
+    """
+    # ++++++++++++Removes quantifiers from original string++++++++++++++
+    # puts all quantifiers into array
+    _quantifiers = re.findall(r'@.*?@', line)
 
-    cut = arroba[-1]
-    _quantifiers = line[:cut + 1]
-    expression = line[cut + 1:]
+    # removes quantifiers from original string
+    output_string = re.sub(r'@.*?@', '', line)
 
-    # print(_quantifiers, "\n", expression)
-    return _quantifiers, expression
+    # ++++++++++++Orders quantifiers in array++++++++++++++
+    # transforms array into string
+    _quantifiers = " ".join(_quantifiers)
+
+    # puts all \forall quantifiers into array
+    _quantifiersA = re.findall(r'@∀.*?@', _quantifiers)
+
+    # removes \forall quantifiers from new quantifiers string
+    _quantifiersE = re.sub(r'@∀.*?@', '', _quantifiers)
+
+    # formats quantifiers string
+    _quantifiersOut = " ".join(_quantifiersA)
+    _quantifiersOut += _quantifiersE
+
+    # removes spaces
+    output_string = re.sub(r'\s+', ' ', output_string)
+    _quantifiersOut = re.sub(r'\s+', ' ', _quantifiersOut)
+
+    result = [_quantifiersOut, output_string]
+
+    # Print the result
+    # print(_quantifiers + output_string)
+
+    return result
 
 
 def subdivide(line):
@@ -490,11 +517,55 @@ def _process_(line):
     Returns a string with the equation resolved.
     """
 
+    # ++++++++++++++ Parser +++++++++++++++++++++++++++++++++++++
     line = replyce_all_symmetrical(line, latex, math)
     line = highlight(line)
-    # line = subdivide(line)
-    
-    return line
+
+    print('\nAfter Parsing: ' + line)
+
+    # ++++++++++++++ Quantifiers +++++++++++++++++++++++++++++++++++++
+    quantifiers = ''
+
+    if '@' in line:
+        splits_return = splits(line)
+        quantifiers = splits_return[0]
+        line = splits_return[1]
+
+    print('\nAfter Removing Quantifiers: ' + line)
+
+    # ++++++++++++ Bimplications ++++++++++++++++++++++++++++++++
+    while is_char_in_line(line, '↔'):
+
+        index = find_char_in_line(line, '↔')
+
+        A = find_directionally(line, index, -1)
+        B = find_directionally(line, index, 1)
+
+        line = resolve_bimplication(A[0], B[0])
+
+    print('\nAfter Bimps: ' + line)
+
+    # ++++++++++++ Implications ++++++++++++++++++++++++++++++++
+    while is_char_in_line(line, '→'):
+
+        index = find_char_in_line(line, '→')
+
+        A = find_directionally(line, index, -1)
+        B = find_directionally(line, index, 1)
+
+        la = line[0 : A[1] -1]
+        lb = line[B[1] +1 : ]
+
+        x = resolve_implication(A[0], B[0])
+
+        line = _concat_in_between(la, x, lb)
+
+        print(B)
+        print(line)
+
+    print('\nNegative Nominal Form: ' + line)
+
+    return (quantifiers + enclosure(line))
 
 
 # skolemization([])
@@ -550,12 +621,12 @@ def _process_(line):
 
 # line = "¬(*X* ∨ *Y*) ↔ (¬*X* ∨ (*Y* → *U*)) ↔ (*A* ∨ *B*)"
 # *A* ↔ ( (*B* ∨ *C*) → (*D* ∧ *F*) ) ∨ ( (*G* ↔ *H*) ∧ *I* ↔ ( *J* → *K* ) ) 
-line = "(*A* ∧ *P*) ↔ (*C* ∧ *E*)"
-A = find_directionally(line, 13, -1)
-B = find_directionally(line, 13, 1)
-x = resolve_bimplication(A[0], B[0])
-# x = _concat_in_between(A, x[1], x[2])
-print(x)
+# line = "(*A* ∧ *P*) ↔ (*C* ∧ *E*)"
+# A = find_directionally(line, 13, -1)
+# B = find_directionally(line, 13, 1)
+# x = resolve_bimplication(A[0], B[0])
+# # x = _concat_in_between(A, x[1], x[2])
+# print(x)
 
 # print(find_char_in_line(line, "∧"))
 
@@ -563,5 +634,18 @@ print(x)
 # char_pos = find_char_in_line(line, r'\)(.*?)\(')
 # print(char_pos)
 
+# ++++++++++++++++++++++++++++++++++ MAIN TESTING +++++++++++++++++++++++++++++++++++
 
-# ((*¬A* ∨ *¬P*) @∨@ (*C* ∧ *E*)) #∧# ((*¬C* ∨ *¬E*) @∨@ (*A* ∧ *P*))
+def main():
+    file_path = "./test.txt"
+    
+    with open(file_path, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+    
+    for line in lines:
+        print("Original: ", line)
+        print("\nResult: ", _process_(line), "\n")
+
+main()
+
+# ++++++++++++++++++++++++++++++++++ MAIN TESTING +++++++++++++++++++++++++++++++++++

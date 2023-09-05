@@ -8,7 +8,7 @@ def main():
     
     for line in lines:
         print("Original: ", line)
-        print("Result: ", _process_(line))
+        print("\nResult: ", _process_(line), "\n")
 
 if __name__ == "__main__":
     main()
