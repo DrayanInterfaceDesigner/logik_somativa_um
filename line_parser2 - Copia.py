@@ -40,21 +40,25 @@ def find_directionally(line, index, direction=1):
     start_writing : bool = False
     open_symbol = r'\)' if direction < 0 else r'\('
     close_symbol = r'\(' if direction < 0 else r'\)'
+    is_star : bool = False
 
     #PROBLEMATIC LINE, IN SOME CASES IT DON'T RETURN
     # THE LAST CHHARACTER, IN SOME CASES IT DO?
     # 
-    stop_at : int = 0 if direction < 0 else (len(line)-1)
+    stop_at : int = 0 if direction < 0 else (len(line))
 
     for char in range(index, stop_at, direction):
         c = line[char]
         # print(c, open_counter)
-        if (bool(re.search(open_symbol, c)) or bool(re.search(r'\*', c)) 
+        if ((bool(re.search(open_symbol, c)) or bool(re.search(r'\*', c)) )
             and not start_writing):
             
             if(bool(re.search(r'\*', c))): 
                 close_symbol = r'\*'
                 open_symbol = r'\*'
+                is_star = True
+                # print('IT WAS!!!',  line[char-2], line[char-1], c, line[char+1], open_symbol, close_symbol)
+                # print(start_writing)
 
             open_counter += 1
             start_writing = True
@@ -63,22 +67,26 @@ def find_directionally(line, index, direction=1):
             continue
         
         if not start_writing: continue
-        if bool(re.search(open_symbol, c)): open_counter += 1
-        if bool(re.search(close_symbol, c)): close_counter += 1
-        print(direction, open_counter, close_counter)
+        if(is_star):
+            if bool(re.search(close_symbol, c)): close_counter += 1
+        else:
+            if bool(re.search(open_symbol, c)): open_counter += 1
+            if bool(re.search(close_symbol, c)): close_counter += 1
+
+        print(direction, open_counter, close_counter, c, open_symbol, close_symbol, bool(re.search(open_symbol, c)))
         
         resultant_string += c
         char_counter = char
         if close_counter == open_counter and open_counter != 0:
             # print("HELLO???", line[char-1], line[char], line[char+1], line[char] == '¬')
-            print("aaaaaaa", line[char-1])
+            # print("aaaaaaa", line[char-1])
             if(direction < 0 and char-1 >= 0 and line[char-1] == '¬'):
                 resultant_string += '¬'
             break    
     
         
     if direction < 0: resultant_string = resultant_string[::-1]
-
+    print("----end-----")
     return [resultant_string, char_counter]
 
 def pop_parentheses(fragment):
@@ -96,17 +104,18 @@ def resolve_imps(line, index):
     for i in range(len(line)):
         
         if line[i] == "→":
-            # resultant_string += ">found<"
+            resultant_string += ">found<"
             A = find_directionally(line, i, -1)
             A = resolve_imps(A[0], A[1])
             # A = pop_parentheses(A)
-            # print(A)
+            print("A: ", A,  "end-a")
             B = find_directionally(line, i, 1)
             B = resolve_imps(B[0], B[1])
             # B = pop_parentheses(B)
+            print("B: ", B, "end-b")
             # resultant_string = resolve_implication_n_demorgan(A, B)
-            # print(resolve_implication_n_demorgan(A, B))
-            return resolve_implication_n_demorgan(A, B)
+            print(resolve_implication_n_demorgan(A, B))
+            # return resolve_implication_n_demorgan(A, B)
 
 
         resultant_string += line[i] 
@@ -400,11 +409,11 @@ def _process_(line):
 #  demorgs - FEYTO
 #  resolve_imps - FEYTO
 #  resolve_bimps - PENDING
-#  distribas - COMYCO --
+#  distribas - PENDING
 #  SPLIT - DONE
 #  skolem - COMYCO - OPTIONAL (talves)
 #  a, b - FEYTO
-#  montage
+#  montage - PENDING
 
 
 # line = "¬((*X* ∨ ¬*Y*) ∧ (¬*X* ∨ *Y*))"
@@ -417,8 +426,11 @@ def _process_(line):
 # ¬((*X* v ¬*Y*) ^ (¬*X* v *Y*))
 # (P ^ ¬Q ^ R(x))
 
-line = "¬(*X* ∨ *Y*) ↔ (¬*X* ∨ (*Y* → *U*)) ↔ (*A* ∨ *B*)"
-A = resolve_bimps(line, 0)
+# line = "¬(*X* ∨ *Y*) ↔ (¬*X* ∨ (*Y* → *U*)) ↔ (*A* ∨ *B*)"
+
+line = " *A* ↔ ( (*B* ∨ *C*) → (*D* ∧ *F*) ) ∨ ( (*G* ↔ *H*) ∧ *I* ↔ ( *J* → *K* ) ) "
+print(line)
+A = resolve_imps(line, 0)
 # A = resolve_implication_n_demorgan("*¬Y*", "(¬*X* ∨ *Y*)")
 # A = find_directionally(line, 13, -1)
 # B = find_directionally(line, 13, 1)
