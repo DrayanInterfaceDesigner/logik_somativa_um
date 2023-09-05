@@ -16,7 +16,9 @@ for line in textFile:
 			if ~~X then X
 			else var = 0
 
-		skolem(eq)
+		if @ in eq:
+			splits(eq)
+			skolem(eq)
 
 		return nnf_eq
 	
