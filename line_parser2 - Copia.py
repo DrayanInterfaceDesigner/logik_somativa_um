@@ -407,7 +407,7 @@ def _process_(line):
 
 # TODO:
 #  demorgs - FEYTO
-#  resolve_imps - FEYTO
+#  resolve_imps - PENDING
 #  resolve_bimps - PENDING
 #  distribas - PENDING
 #  SPLIT - DONE
