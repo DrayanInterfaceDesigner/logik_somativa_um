@@ -1,0 +1,24 @@
+# tem q fazer duas funções pq a gente vai rodar uma pra cada forma normal a partir da mesma linha
+# 
+
+def distributiva_disj(line):
+    if ^ in line:
+        Get(A, B)
+        if v in A:
+            Get(Aa, Ab)
+            line = (B ^ Aa) v (B ^ Ab)
+        elif v in B:
+            Get(Ba, Bb)
+            line = (A ^ Ba) v (A ^ Bb)
+    return line
+
+def distributiva_conj(line):
+    if v in line:
+        Get(A, B)
+        if ^ in A:
+            Get(Aa, Ab)
+            line = (B v Aa) ^ (B v Ab)
+        elif ^ in B:
+            Get(Ba, Bb)
+            line = (A v Ba) ^ (A v Bb)
+    return line
