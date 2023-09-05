@@ -41,7 +41,10 @@ def find_directionally(line, index, direction=1):
     open_symbol = r'\)' if direction < 0 else r'\('
     close_symbol = r'\(' if direction < 0 else r'\)'
 
-    stop_at : int = 0 if direction < 0 else (len(line))
+    #PROBLEMATIC LINE, IN SOME CASES IT DON'T RETURN
+    # THE LAST CHHARACTER, IN SOME CASES IT DO?
+    # 
+    stop_at : int = 0 if direction < 0 else (len(line)-1)
 
     for char in range(index, stop_at, direction):
         c = line[char]
@@ -78,6 +81,12 @@ def find_directionally(line, index, direction=1):
 
     return [resultant_string, char_counter]
 
+def pop_parentheses(fragment):
+    #pops the first (
+    fragment = re.sub(r'\(', '', fragment, count=1)
+    #pops the last )
+    fragment = re.sub(r'\)(?=[^)]*$)', '', fragment, count=1)
+    return fragment
 
 def resolve_imps(line, index):
 
@@ -89,13 +98,12 @@ def resolve_imps(line, index):
         if line[i] == "→":
             # resultant_string += ">found<"
             A = find_directionally(line, i, -1)
-            print(A[0])
             A = resolve_imps(A[0], A[1])
+            # A = pop_parentheses(A)
             # print(A)
             B = find_directionally(line, i, 1)
-            print(B[0])
-
             B = resolve_imps(B[0], B[1])
+            # B = pop_parentheses(B)
             # resultant_string = resolve_implication_n_demorgan(A, B)
             # print(resolve_implication_n_demorgan(A, B))
             return resolve_implication_n_demorgan(A, B)
@@ -122,11 +130,11 @@ def resolve_bimps(line, index):
             B = find_directionally(line, i, 1)
             print(B[0])
             B = resolve_imps(B[0], B[1])
-            B = resolve_imps(B, 0)
+            B = resolve_bimps(B, 0)
             # resultant_string = resolve_implication_n_demorgan(A, B)
             # print(resolve_implication_n_demorgan(A, B))
             print(A, B)
-            return resolve_implication_n_demorgan(A, B) + " ∨ " + resolve_implication_n_demorgan(B, A)
+            # return resolve_implication_n_demorgan(A, B) + " ∨ " + resolve_implication_n_demorgan(B, A)
 
 
         resultant_string += line[i] 
@@ -184,6 +192,7 @@ def de_negate_every_member(fragment):
 
         fragment = re.sub(r'(¬{2,})', '', fragment)
 
+        fragment = pop_parentheses(fragment)
         # print(fragment)
         return fragment
 
