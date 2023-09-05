@@ -1,3 +1,4 @@
-\forall (xyz) \exists x (P(x) \wedge Q( x,y, z) \leftrightarrow (R \rightarrow (P \rightarrow \neg Q)))
+\forall (xyz) (P(x, y, z) \wedge Q(x, y, z) \leftrightarrow  \exists w (R(w) \rightarrow (P \rightarrow \neg Q)))
 \forall x \exists y ((P(x) \vee \neg Q(x)) \rightarrow (R(y) \vee (P(y) \wedge \neg Q(y))))
+\forall x \exists y \forall z \exists w
 \neg (P \leftrightarrow Q) \leftrightarrow R

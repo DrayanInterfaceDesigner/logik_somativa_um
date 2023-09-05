@@ -252,19 +252,37 @@ def demorgan(line):
 # ++++++++++++++++++++++++++++++++++++++++
 
 def splits(line):
-    arroba = []
+    # ++++++++++++Removes quantifiers from original string++++++++++++++
+    # puts all quantifiers into array
+    _quantifiers = re.findall(r'@.*?@', line)
 
-    for x in range(len(line)): 
-        if line[x] == "@":
-            arroba.append(x)
+    # removes quantifiers from original string
+    output_string = re.sub(r'@.*?@', '', line)
 
-    cut = arroba[-1]
-    _quantifiers = line[:cut + 1]
-    expression = line[cut + 1:]
+    # ++++++++++++Orders quantifiers in array++++++++++++++
+    # transforms array into string
+    _quantifiers = " ".join(_quantifiers)
 
-    # print(_quantifiers, "\n", expression)
-    return _quantifiers, expression
+    # puts all \forall quantifiers into array
+    _quantifiersA = re.findall(r'@∀.*?@', _quantifiers)
 
+    # removes \forall quantifiers from new quantifiers string
+    _quantifiersE = re.sub(r'@∀.*?@', '', _quantifiers)
+
+    # formats quantifiers string
+    _quantifiersOut = " ".join(_quantifiersA)
+    _quantifiersOut += _quantifiersE
+
+    # removes spaces
+    output_string = re.sub(r'\s+', ' ', output_string)
+    _quantifiersOut = re.sub(r'\s+', ' ', _quantifiersOut)
+
+    result = [_quantifiersOut, output_string]
+
+    # Print the result
+    # print(_quantifiers + output_string)
+
+    return result
 
 def subdivide(line):
 
@@ -290,8 +308,10 @@ def _process_(line):
     line = replyce_all_symmetrical(line, latex, math)
     print("Modified: ", line)
     line = highlight(line)
+    print('highlight ' + line)
     # line = subdivide(line)
-    
+    line = splits(line)
+    print("splits: ", line)
     return line
 
 
