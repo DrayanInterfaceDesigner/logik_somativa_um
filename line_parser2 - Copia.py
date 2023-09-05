@@ -24,16 +24,73 @@ quantifiers = ["∀", "∃"]
 # (𝑃 ∧ 𝑄 <-> (𝑅 → (𝑃 → ¬𝑄))
 line = fr"\forall (xyz) \exists x (P(x) \wedge Q( x,y, z) \leftrightarrow (R \rightarrow (P \rightarrow \neg Q)))"
 
-def ensure_predicates_spaces(): pass
-def subdivide(): pass
-def replace_lates(): pass
-def get_quantifiers(line): pass
-def get_imps_n_bimps(): pass
-
 def _concat_in_between(a, operator, b):
+    """
+    This function concatanates the given sides 
+    A and B, with a given operator.
+
+    Returns a string with the sides concataned.
+    """
     return f"{a} {operator} {b}"
 
+def enclosure(a):
+    return f"({a})"
+
+def splits(line):
+    """
+    This function splits an given equation into
+    two groups. One with quantifiers, and the other 
+    with the equation with its quantifiers extracted
+    from it.
+
+    Returns an array with two strings: quantifiers and equation.
+    """
+    # ++++++++++++Removes quantifiers from original string++++++++++++++
+    # puts all quantifiers into array
+    _quantifiers = re.findall(r'@.*?@', line)
+
+    # removes quantifiers from original string
+    output_string = re.sub(r'@.*?@', '', line)
+
+    # ++++++++++++Orders quantifiers in array++++++++++++++
+    # transforms array into string
+    _quantifiers = " ".join(_quantifiers)
+
+    # puts all \forall quantifiers into array
+    _quantifiersA = re.findall(r'@∀.*?@', _quantifiers)
+
+    # removes \forall quantifiers from new quantifiers string
+    _quantifiersE = re.sub(r'@∀.*?@', '', _quantifiers)
+
+    # formats quantifiers string
+    _quantifiersOut = " ".join(_quantifiersA)
+    _quantifiersOut += _quantifiersE
+
+    # removes spaces
+    output_string = re.sub(r'\s+', ' ', output_string)
+    _quantifiersOut = re.sub(r'\s+', ' ', _quantifiersOut)
+
+    result = [_quantifiersOut, output_string]
+
+    # Print the result
+    # print(_quantifiers + output_string)
+
+    return result
+
 def find_directionally(line, index, direction=1):
+    """
+    Given an equation, a starting index and a 
+    direction (-1 is rtl, 1 is ltr, default is ltr),
+    finds the A or B side (based on the direction) 
+    of the given equation.
+
+    Returns an array containing a string (the side),
+    and the index it finished.
+    """
+
+    # puts a space at the begning and ending of the line
+    line = re.sub(r'^', ' ', line)
+    line = re.sub(r'$', ' ', line)
 
     resultant_string = ""
     open_counter : int = 0
@@ -92,82 +149,46 @@ def find_directionally(line, index, direction=1):
     return [resultant_string, char_counter]
 
 def pop_parentheses(fragment):
+    """
+    Removes the greater indented pair of parentheses
+    it can find.
+
+    Returns a string with less parentheses than before.
+    """
     #pops the first (
     fragment = re.sub(r'\(', '', fragment, count=1)
     #pops the last )
     fragment = re.sub(r'\)(?=[^)]*$)', '', fragment, count=1)
     return fragment
 
-def resolve_imps(line, index):
-
-    resultant_string = ""
-    A = []
-    B = []
-    for i in range(len(line)):
-        
-        if line[i] == "→":
-            resultant_string += ">found<"
-            A = find_directionally(line, i, -1)
-            A = resolve_imps(A[0], A[1])
-            # A = pop_parentheses(A)
-            print("A: ", A,  "end-a")
-            B = find_directionally(line, i, 1)
-            B = resolve_imps(B[0], B[1])
-            # B = pop_parentheses(B)
-            print("B: ", B, "end-b")
-            # resultant_string = resolve_implication_n_demorgan(A, B)
-            # print(resolve_implication(A, B))
-            return resolve_implication(A, B)
-
-
-        resultant_string += line[i] 
-    # print(line, "\n", original_string_copy, "\n", _quantifiers, "\n", expression)
-    return resultant_string
-
-def resolve_bimps(line, index):
-
-    resultant_string = ""
-    A = []
-    B = []
-    for i in range(len(line)):
-        
-        if line[i] == "↔":
-            resultant_string += ">found<"
-            A = find_directionally(line, i, -1)
-            print(A[0])
-            A = resolve_imps(A[0], A[1])
-            A = resolve_bimps(A, 0)
-            # print(A)
-            B = find_directionally(line, i, 1)
-            print(B[0])
-            B = resolve_imps(B[0], B[1])
-            B = resolve_bimps(B, 0)
-            # resultant_string = resolve_implication_n_demorgan(A, B)
-            # print(resolve_implication_n_demorgan(A, B))
-            print(A, B, " > ", resolve_imps(A, B))
-            # return resolve_implication_n_demorgan(A, B) + " ∨ " + resolve_implication_n_demorgan(B, A)
-
-
-        resultant_string += line[i] 
-    # print(line, "\n", original_string_copy, "\n", _quantifiers, "\n", expression)
-    return resultant_string
-
 
 def _switch_operator(fragment):
+    """
+    This function, given an expression, switches the
+    first encountered ∨ or ∧ operator, and switches
+    every occurrence of it to the opposite.
+
+    Returns a string with occurrence of the first operator
+    it finds, inverted.
+    """
     operator = bool(re.search(r'∨', fragment))
     if(operator): return re.sub(r'∨', r'∧', fragment)
     else: return re.sub(r'∧', r'∨', fragment)
 
 
 def negate_every_member(fragment):
-    # TODO:
-    # Also find every composed predicate - DONE 
+    """
+    This function, given an expression, negates every predicate
+    it finds.
+
+    Returns a string with every predicate negated.
+    """
     fragment = re.sub(r'([A-Z])\(([^)]*)\)', r'¬\1(\2)', fragment)
     fragment = re.sub(r'(?<![A-Z])\b([A-Z])\b(?! *\()', r'¬\1', fragment)
     return fragment
 
 def de_negate_every_member(fragment):
-
+    
     trimmed = fragment
     trimmed = trimmed.replace(" ", "")
     fragment = fragment
@@ -210,29 +231,37 @@ def de_negate_every_member(fragment):
     else:
         fragment = re.sub(r'(¬{2,})', '', fragment)
         return fragment
-    # find every ¬¬ and replace with nothing.
-    # find every ¬(¬ ... ¬ ... ¬) and
-    # replace with nothing (the hard one :p)
-    # basically, if fragment startsWith('¬')
-    # remove every '¬' (not that hard), but not
-    # pairs of '¬'
-
-    # WARNING!!!!!!!!!!!:
-    # actually:
-    # if starts with '¬('
-    # every '¬' replace with nothing 
-    # every '¬¬' replace for '¬'
-    return fragment
 
 def replyce(string, look_for, change_to):
+    """
+    This function uses RegExpressions to find a given expression
+    or character, and change it to an another given expresion
+    or character.
+
+    Returns a string with everything occurrence replaced.
+    """
     return string.replace(look_for, change_to)
 
 def replyce_all_symmetrical(line, look_for, change_to):
+    """
+    This function uses the replyce() function to symmetrically
+    replace every character in look_for (param 1), to a 
+    respective character in change_to (param 2).
+
+    Returns a string with everything occurrence replaced.
+    """
     for case in range(len(look_for)):
         line = replyce(line, look_for=look_for[case], change_to=change_to[case])
     return line
 
 def highlight(line):
+    """
+    This function uses RegExpressions to find and
+    highlight predicates and quantifiers given an
+    proper equation (does not support Latex).
+
+    Returns a string with highlighted predicates and quantifiers.
+    """
     # find composed predicates
     # line = re.sub(r'([A-Z])\(([a-z]*)\)', r'*\1(\2)*', line) 
     line = re.sub(r'([A-Z])\(([^)]*)\)', r'*\1(\2)*', line)
@@ -249,6 +278,12 @@ def highlight(line):
     return line
 
 def demorgan(fragment):
+    """
+    This function applies demorgan rules to a given
+    part of an equation.
+
+    Returns a string with the equation resolved.
+    """
     fragment = de_negate_every_member(fragment)
     _fragment = ""
     for char in fragment:
@@ -321,20 +356,63 @@ def _skolemize(nesting, input, output=""):
     nesting-=1
     _skolemize(nesting, input, output)
 
-
 def resolve_implication(A, B):
-    return (f"¬({A})") + f" ∨ {B}"
+    """
+    This function applies conditional rules
+    to a given pair of A and B parts of an
+    equation.
+
+    Returns an array with the first equation negated,
+    the or operator, and the B.
+    """
+    
+    return (demorgan(f"¬({A})") + f" ∨ {B}")
 
 def resolve_bimplication(A, B):
+    """
+    This function uses the resolve_implication()
+    function to apply biconditional rules to a given
+    pair of A and B of an equation.
 
+    Returns a string with the equation resolved.
+    """
     _a = resolve_implication(A, B)
     _b = resolve_implication(B, A)
 
-    return _concat_in_between(_a, "∧", _b)
+    return _concat_in_between(enclosure(_a), "∧", enclosure(_b))
 
 
+def find_char_in_line(line, char):
+    """
+    This function looks for a char inside a given line,
+    and returns the index of the first it can find.
+    
+    Returns None if it doesn't exists, or else the index 
+    of where the character was found.
+    """
+    search = re.search(char, line)
+    return None if not search else search.start()
 
+def is_char_in_line(line, char):
+    """
+    This function looks for a char inside a given line,
+    and returns a boolean.
+    
+    Returns a boolean.
+    """
+    return bool(re.search(char, line))
 
+# def distributiva_disj(line):
+#     char_pos = find_char_in_line(line, r'\)(.*?)\(')
+#     if char_pos is not None:
+        
+#         if v in A:
+#             Get(Aa, Ab)
+#             line = (B ^ Aa) v (B ^ Ab)
+#         elif v in B:
+#             Get(Ba, Bb)
+#             line = (A ^ Ba) v (A ^ Bb)
+#     return line
 
 
 
@@ -375,6 +453,13 @@ def subdivide(line):
 
 # ESSE CARA EH O PIKA
 def _process_(line):
+
+    """
+    This function applies all necessary rules and
+    checkers to resolve an given equation.
+
+    Returns a string with the equation resolved.
+    """
 
     line = replyce_all_symmetrical(line, latex, math)
     line = highlight(line)
@@ -436,14 +521,15 @@ def _process_(line):
 
 # line = "¬(*X* ∨ *Y*) ↔ (¬*X* ∨ (*Y* → *U*)) ↔ (*A* ∨ *B*)"
 # *A* ↔ ( (*B* ∨ *C*) → (*D* ∧ *F*) ) ∨ ( (*G* ↔ *H*) ∧ *I* ↔ ( *J* → *K* ) ) 
-line = " (*A* ∧ *P*) ↔ (*C* ∧ (*D* → *E*)) "
-print(line)
-
+line = "(*A* ∧ *P*) ↔ (*C* ∧ *E*)"
 A = find_directionally(line, 13, -1)
 B = find_directionally(line, 13, 1)
-print(A, "\n : \n", B, "\n\n\n\n\n\n")
+x = resolve_bimplication(A[0], B[0])
+# x = _concat_in_between(A, x[1], x[2])
+print(x)
 
+# print(find_char_in_line(line, "∧"))
 
-A = resolve_bimplication(A[0], B[0])
-# A = resolve_implication_n_demorgan("*¬Y*", "(¬*X* ∨ *Y*)")
-print(A)
+# line = " (*(P v Q*) v (*G* ^ U))) v (*A* ^ B )"
+# char_pos = find_char_in_line(line, r'\)(.*?)\(')
+# print(char_pos)

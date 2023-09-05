@@ -252,6 +252,14 @@ def demorgan(line):
 # ++++++++++++++++++++++++++++++++++++++++
 
 def splits(line):
+    """
+    This function splits an given equation into
+    two groups. One with quantifiers, and the other 
+    with the equation with its quantifiers extracted
+    from it.
+
+    Returns an array with two strings: quantifiers and equation.
+    """
     # ++++++++++++Removes quantifiers from original string++++++++++++++
     # puts all quantifiers into array
     _quantifiers = re.findall(r'@.*?@', line)

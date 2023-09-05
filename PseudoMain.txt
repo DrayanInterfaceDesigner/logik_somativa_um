@@ -10,10 +10,10 @@ for line in textFile:
 		var = 1
 		while var != 0:
 			if (X <-> Y) then (X v ~Y) ^ (~X v Y)
-			if (X -> Y) then (~X v Y)
-			if ~(X v Y) then (~X ^ ~Y)
-			if ~(X ^ Y) then (~X v ~Y)
-			if ~~X then X
+			elif (X -> Y) then (~X v Y)
+			elif ~(X v Y) then (~X ^ ~Y)
+			elif ~(X ^ Y) then (~X v ~Y)
+			elif ~~X then X
 			else var = 0
 
 		if @ in eq:
