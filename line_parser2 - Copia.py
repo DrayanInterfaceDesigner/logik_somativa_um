@@ -30,6 +30,8 @@ def replace_lates(): pass
 def get_quantifiers(line): pass
 def get_imps_n_bimps(): pass
 
+def _concat_in_between(a, operator, b):
+    return f"{a} {operator} {b}"
 
 def find_directionally(line, index, direction=1):
 
@@ -73,7 +75,7 @@ def find_directionally(line, index, direction=1):
             if bool(re.search(open_symbol, c)): open_counter += 1
             if bool(re.search(close_symbol, c)): close_counter += 1
 
-        print(direction, open_counter, close_counter, c, open_symbol, close_symbol, bool(re.search(open_symbol, c)))
+        # print(direction, open_counter, close_counter, c, open_symbol, close_symbol, bool(re.search(open_symbol, c)))
         
         resultant_string += c
         char_counter = char
@@ -114,8 +116,8 @@ def resolve_imps(line, index):
             # B = pop_parentheses(B)
             print("B: ", B, "end-b")
             # resultant_string = resolve_implication_n_demorgan(A, B)
-            print(resolve_implication_n_demorgan(A, B))
-            # return resolve_implication_n_demorgan(A, B)
+            # print(resolve_implication(A, B))
+            return resolve_implication(A, B)
 
 
         resultant_string += line[i] 
@@ -142,7 +144,7 @@ def resolve_bimps(line, index):
             B = resolve_bimps(B, 0)
             # resultant_string = resolve_implication_n_demorgan(A, B)
             # print(resolve_implication_n_demorgan(A, B))
-            print(A, B)
+            print(A, B, " > ", resolve_imps(A, B))
             # return resolve_implication_n_demorgan(A, B) + " ∨ " + resolve_implication_n_demorgan(B, A)
 
 
@@ -320,9 +322,15 @@ def _skolemize(nesting, input, output=""):
     _skolemize(nesting, input, output)
 
 
-def resolve_implication_n_demorgan(A, B):
-    return demorgan(f"¬({A})") + f" ∨ {B}"
+def resolve_implication(A, B):
+    return (f"¬({A})") + f" ∨ {B}"
 
+def resolve_bimplication(A, B):
+
+    _a = resolve_implication(A, B)
+    _b = resolve_implication(B, A)
+
+    return _concat_in_between(_a, "∧", _b)
 
 
 
@@ -427,11 +435,15 @@ def _process_(line):
 # (P ^ ¬Q ^ R(x))
 
 # line = "¬(*X* ∨ *Y*) ↔ (¬*X* ∨ (*Y* → *U*)) ↔ (*A* ∨ *B*)"
-
-line = " *A* ↔ ( (*B* ∨ *C*) → (*D* ∧ *F*) ) ∨ ( (*G* ↔ *H*) ∧ *I* ↔ ( *J* → *K* ) ) "
+# *A* ↔ ( (*B* ∨ *C*) → (*D* ∧ *F*) ) ∨ ( (*G* ↔ *H*) ∧ *I* ↔ ( *J* → *K* ) ) 
+line = " (*A* ∧ *P*) ↔ (*C* ∧ (*D* → *E*)) "
 print(line)
-A = resolve_imps(line, 0)
+
+A = find_directionally(line, 13, -1)
+B = find_directionally(line, 13, 1)
+print(A, "\n : \n", B, "\n\n\n\n\n\n")
+
+
+A = resolve_bimplication(A[0], B[0])
 # A = resolve_implication_n_demorgan("*¬Y*", "(¬*X* ∨ *Y*)")
-# A = find_directionally(line, 13, -1)
-# B = find_directionally(line, 13, 1)
 print(A)
