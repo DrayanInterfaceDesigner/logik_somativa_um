@@ -375,10 +375,10 @@ def resolve_bimplication(A, B):
 
     Returns a string with the equation resolved.
     """
-    _a = resolve_implication(A, B)
-    _b = resolve_implication(B, A)
+    # _a = resolve_implication(A, B)
+    # _b = resolve_implication(B, A)
 
-    return _concat_in_between(_a, "∧", _b)
+    return f'({A} → {B}) ∧ ({B} → {A})'
 
 
 def find_char_in_line(line, char):
@@ -386,7 +386,7 @@ def find_char_in_line(line, char):
     This function looks for a char inside a given line,
     and returns the index of the first it can find.
     
-    Returns None if it doesn't exists, or else the index 
+    Returns None if it doesn't exist, or else the index 
     of where the character was found.
     """
     search = re.search(char, line)
@@ -421,8 +421,6 @@ def find_for_distribution(line, conj=True):
     return None
 
 def distributiva(line, conj):
-    _line = ''
-
     if conj == True:
         divisor = '∨'
         look_inside = '∧'
@@ -431,10 +429,13 @@ def distributiva(line, conj):
         look_inside = '∨'
     
     sides = find_for_distribution(line, conj)
-    if sides is None: raise Exception("[Distribution error => disjuntive]: No sides to distribute blz?.")
+    if sides is None: return 'None'
 
     sideA = sides[0][0]
     sideB = sides[1][0]
+ 
+    restL = line[0 : sides[0][1] -2]
+    restR = line[sides[1][1]: -1]
             
     if is_char_in_line(sideA, look_inside):
 
@@ -443,15 +444,10 @@ def distributiva(line, conj):
         a = find_directionally(sideA, index, -1)
         b = find_directionally(sideA, index, 1)
 
-        # print(a, "marcelo", b)
-
         result = f"({sideB} {divisor} {a[0]}) {look_inside} ({sideB} {divisor} {b[0]})"
-        la = line[0 : sides[0][1] -2]
-        lb = line[sides[1][1] +1 : ]
+        
 
-        print(la, 'renato', result, 'aurelio', lb)
-
-        _line = _concat_in_between(la, result, lb)
+        _line = _concat_in_between(restL, result, restR)
 
     elif is_char_in_line(sideB, look_inside):
 
@@ -464,12 +460,11 @@ def distributiva(line, conj):
         la = line[0 : sides[0][1] -2]
         lb = line[sides[1][1] +1 : ]
 
-        print(la, 'renato', result, 'aurelio', lb)
-
-        _line = _concat_in_between(la, result, lb)
         
-    # print('leonardo', _line)
-    return result
+
+        _line = _concat_in_between(restL, result, restR)
+
+    return _line
 
 # x = (( (*R(w)* ∨  (*P* ∨ *Q*) )  ∨ *Q(x, y, z)*) ∧ *¬Q(x, y, z)*) ∨ (( (*R(w)* ∨  (*P* ∨ *Q*) )  ∨ *Q(x, y, z)*) ∧ (*¬R(w)* ∨  (*¬P* ∨ *Q*) ))
     
@@ -599,21 +594,35 @@ def _process_(line):
     print('\nNegative Nominal Form: ' + line)
 
     # ++++++++++++ Conjunctive ++++++++++++++++++++++++++++++++
+    line_con = line
     s = 1
-    x = line
+    x = ''
     while s != 0:
-        x = distributiva(x, False)
-        print('\nMARCOS', line)
-        print('DAR O CU', x)
-        if x == line:
+        x = distributiva(line_con, True)
+        if x == 'None':
             s = 0
+        else:
+            line_con = x
 
-    print(line)
+    conj_result = quantifiers + line_con
+    print("\nConjunctive: ", conj_result)
     
 
     # ++++++++++++ Disjunctive ++++++++++++++++++++++++++++++++
+    line_dis = line
+    s = 1
+    x = ''
+    while s != 0:
+        x = distributiva(line_dis, False)
+        if x == 'None':
+            s = 0
+        else:
+            line_dis = x
+    
+    disj_result = quantifiers + line_dis
+    print("\nDisjunctive: ", disj_result)
 
-    return (quantifiers + enclosure(line))
+    return [conj_result, disj_result]
 
 
 # skolemization([])
@@ -692,7 +701,9 @@ def main():
     
     for line in lines:
         print("Original: ", line)
-        print("\nResult: ", _process_(line), "\n")
+        result_arr = _process_(line)
+        print(result_arr[0]) # Conjunctive
+        print(result_arr[1]) # Disjunctive
 
 main()
 
