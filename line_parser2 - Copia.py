@@ -262,12 +262,21 @@ def highlight(line):
 
     Returns a string with highlighted predicates and quantifiers.
     """
+    # find negated composed predicates
+    line = re.sub(r'¬([A-Z])\(([^)]*)\)', r'*¬\1(\2)*', line)
+
+    #replacing every negated solo predicate with its negated form within a pair of *
+    line = re.sub(r'(?<=¬)(?<![A-Z])\b([A-Z])\b(?! *\()', r'*¬\1*', line)
+
+    #removes all negations outside a pair of *
+    line = re.sub(r'¬(\*)', r'\1', line)
+
     # find composed predicates
-    # line = re.sub(r'([A-Z])\(([a-z]*)\)', r'*\1(\2)*', line) 
-    line = re.sub(r'([A-Z])\(([^)]*)\)', r'*\1(\2)*', line)
+    # line = re.sub(r'([A-Z])\(([a-z]*)\)', r'*\1(\2)*', line)
+    line = re.sub(r'(?<!¬)([A-Z])\(([^)]*)\)', r'*\1(\2)*', line)
 
     # find solo predicates
-    line = re.sub(r'(?<![A-Z])\b([A-Z])\b(?! *\()', r'*\1*', line)
+    line = re.sub(r'(?<!¬)(?<![A-Z])\b([A-Z])\b(?! *\()', r'*\1*', line)
 
     # find composed quantifiers
     line = re.sub(r'([∀∃])\(([a-z]*)\)', r'@\1(\2)@', line)
